@@ -21,9 +21,10 @@ class HomeworkCreateMutation(graphene.Mutation, HomeworkRelatedMutation):
 
     @classmethod
     def mutate(cls, _, info, topic: str, task: str):
-        topic_exists = Homework.objects.filter(topic=topic).exists()
+        task = task.replace("'''", '"""').replace('%%', '\n')
+        topic_exists = Homework.objects.filter(topic=topic)
         if topic_exists:
-            return cls(homework=None, request_details=f'Помилка. Домашнє завдання з темою "{topic}" вже існує.')
+            return cls(homework=None, request_details=f'Домашнє завдання з темою "{topic}" вже існує.')
         new_homework = Homework.objects.create(topic=topic, task=task, deadline=cls.deadline)
         return cls(homework=new_homework, request_details='success')
 
@@ -39,7 +40,7 @@ class HomeworkAssignMutation(graphene.Mutation, HomeworkRelatedMutation):
         homework = Homework.objects.filter(topic=homework_topic).first()
         if not homework:
             return cls(homework=homework,
-                       request_details=f'Помилка. Домашнього завдання з темою "{homework_topic}" не існує.')
+                       request_details=f'Домашнього завдання з темою "{homework_topic}" не існує.')
 
         if group_name:
             return cls.assign_by_group_name(homework=homework, group_name=group_name)
@@ -49,16 +50,24 @@ class HomeworkAssignMutation(graphene.Mutation, HomeworkRelatedMutation):
 
     @staticmethod
     def assign_homework(student_id: int, homework_id: int):
-        table_manager = StudentHomework.objects
-        combinations_exists = table_manager.filter(student_id=student_id, homework_id=homework_id).exists()
+        combinations_exists = StudentHomework.objects.filter(
+            student_id=student_id,
+            homework_id=homework_id
+        )
+
         if not combinations_exists:
-            table_manager.create(student_id=student_id, homework_id=homework_id, is_done=False, is_submitted=False)
+            StudentHomework.objects.create(
+                student_id=student_id,
+                homework_id=homework_id,
+                is_done=False,
+                is_submitted=False
+            )
 
     @classmethod
     def assign_by_group_name(cls, homework: Homework, group_name: str):
         group = StudentGroup.objects.filter(name=group_name).first()
         if not group:
-            return cls(homework=homework, request_details=f'Помилка. Групи з назвою {group_name} не існує.')
+            return cls(homework=homework, request_details=f'Групи з назвою {group_name} не існує.')
         for student in group.student_set.all():
             cls.assign_homework(student_id=student.telegram_id, homework_id=homework.id)
         return cls(homework=homework, request_details="success")
@@ -67,7 +76,7 @@ class HomeworkAssignMutation(graphene.Mutation, HomeworkRelatedMutation):
     def assign_by_student_username(cls, homework: Homework, student_username: str):
         student = Student.objects.filter(username=student_username).first()
         if not student:
-            return cls(homework=homework, requst_details=f'Помилка. Студента з іменем {student_username} не існує.')
+            return cls(homework=homework, requst_details=f'Студента з іменем {student_username} не існує.')
         cls.assign_homework(student_id=student.telegram_id, homework_id=homework.id)
         return cls(homework=homework, request_details="success")
 
@@ -76,9 +85,10 @@ class HomeworkSubmitMutation(graphene.Mutation, HomeworkRelatedMutation):
     class Arguments:
         student_id = graphene.Int()
         topic = graphene.String()
+        content = graphene.String()
 
     @classmethod
-    def mutate(cls, _, info, student_id: int, topic: str):
+    def mutate(cls, _, info, student_id: int, topic: str, content: str):
         homework = Homework.objects.filter(topic=topic).first()
         if not homework:
             return cls(homework=homework,
@@ -87,10 +97,8 @@ class HomeworkSubmitMutation(graphene.Mutation, HomeworkRelatedMutation):
         if not homework_pair:
             return cls(homework=homework,
                        request_details=f'У Вас немає домашнього завдання з теми "{topic}."')
-        if homework_pair.is_submitted:
-            return cls(homework=homework,
-                       request_details=f'Домашнє завдання з теми "{homework.topic}" вже подане на розгляд.')
         homework_pair.is_submitted = True
+        homework_pair.content = content.replace("'''", '"""').replace('%%', '\n')
         homework_pair.save()
         return cls(homework=homework, request_details='success')
 
@@ -103,10 +111,9 @@ class AcceptOrDeclineHomework:
 
 class HomeworkMarkMutation(graphene.Mutation, HomeworkRelatedMutation, AcceptOrDeclineHomework):
     @classmethod
-    def mutate(cls, _, info, student_id: int, homework_id: int, submitted_content: str):
+    def mutate(cls, _, info, student_id: int, homework_id: int):
         submitted_homework = StudentHomework.objects.get(student_id=student_id, homework_id=homework_id)
         submitted_homework.is_done = True
-        submitted_homework.content = submitted_content
         submitted_homework.save()
 
         homework = Homework.objects.get(id=homework_id)
