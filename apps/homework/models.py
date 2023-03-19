@@ -4,7 +4,7 @@ from apps.students.models import Student
 
 
 class Homework(models.Model):
-    topic = models.CharField(max_length=40, unique=True)
+    topic = models.CharField(max_length=80, unique=True)
     task = models.TextField()
     deadline = models.DateField()
     objects = models.Manager()

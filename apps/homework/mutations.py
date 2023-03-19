@@ -21,7 +21,7 @@ class HomeworkCreateMutation(graphene.Mutation, HomeworkRelatedMutation):
 
     @classmethod
     def mutate(cls, _, info, topic: str, task: str):
-        task = task.replace("'''", '"""').replace('%%', '\n')
+        task = task.replace("'''", '"""').replace('%%', '\n').replace('##', '\\')
         topic_exists = Homework.objects.filter(topic=topic)
         if topic_exists:
             return cls(homework=None, request_details=f'Домашнє завдання з темою "{topic}" вже існує.')
@@ -98,7 +98,7 @@ class HomeworkSubmitMutation(graphene.Mutation, HomeworkRelatedMutation):
             return cls(homework=homework,
                        request_details=f'У Вас немає домашнього завдання з теми "{topic}."')
         homework_pair.is_submitted = True
-        homework_pair.content = content.replace("'''", '"""').replace('%%', '\n')
+        homework_pair.content = content.replace("'''", '"""').replace('%%', '\n').replace('##', '\\')
         homework_pair.save()
         return cls(homework=homework, request_details='success')
 
