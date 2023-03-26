@@ -1,6 +1,4 @@
 import graphene
-
-from apps.homework.models import StudentHomework
 from apps.students.models import Student, StudentGroup
 from python_bot_api.types import StudentType, StudentGroupType
 
