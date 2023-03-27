@@ -1,8 +1,8 @@
 import graphene
 from graphene_django import DjangoObjectType
 
-from apps.homework.models import Homework, StudentHomework
-from apps.students.models import Student, StudentGroup
+from server.apps.homework.models import Homework, StudentHomework
+from server.apps.students.models import Student, StudentGroup
 
 
 class HomeworkType(DjangoObjectType):

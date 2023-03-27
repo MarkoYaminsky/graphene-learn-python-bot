@@ -19,8 +19,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'graphene_django',
-    'apps.students',
-    'apps.homework',
+    'server.apps.students',
+    'server.apps.homework',
 ]
 
 MIDDLEWARE = [
@@ -33,7 +33,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'python_bot_api.urls'
+ROOT_URLCONF = 'server.config.urls'
 
 TEMPLATES = [
     {
@@ -52,7 +52,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'python_bot_api.wsgi.application'
+WSGI_APPLICATION = 'server.config.wsgi.application'
 
 DATABASES = {
     'default': {
@@ -60,7 +60,7 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': 5432
     }
 }
@@ -93,7 +93,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 GRAPHENE = {
-    'SCHEMA': 'python_bot_api.schema.schema'
+    'SCHEMA': 'server.config.schema.schema'
 }
 
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1, http://localhost']
+STATIC_ROOT = './server/static'

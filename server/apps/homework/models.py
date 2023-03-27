@@ -1,6 +1,6 @@
 from django.db import models
 
-from apps.students.models import Student
+from server.apps.students.models import Student
 
 
 class Homework(models.Model):
@@ -18,7 +18,7 @@ class StudentHomework(models.Model):
     homework_id = models.IntegerField()
     is_done = models.BooleanField(default=False)
     is_submitted = models.BooleanField(default=False)
-    content = models.TextField(blank=True)
+    content = models.TextField(blank=True, null=True)
     objects = models.Manager()
 
     def __str__(self):

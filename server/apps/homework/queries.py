@@ -1,8 +1,8 @@
 import graphene
 
-from apps.homework.models import StudentHomework, Homework
-from apps.students.models import Student, StudentGroup
-from python_bot_api.types import HomeworkType, StudentHomeworkType
+from server.apps.homework.models import StudentHomework, Homework
+from server.apps.students.models import Student, StudentGroup
+from server.config.types import HomeworkType, StudentHomeworkType
 
 
 class HomeworkQuery(graphene.ObjectType):

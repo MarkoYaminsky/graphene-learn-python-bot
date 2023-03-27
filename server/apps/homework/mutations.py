@@ -2,9 +2,9 @@ import datetime
 
 import graphene
 
-from apps.homework.models import Homework, StudentHomework
-from apps.students.models import StudentGroup, Student
-from python_bot_api.types import HomeworkType
+from server.apps.homework.models import Homework, StudentHomework
+from server.apps.students.models import StudentGroup, Student
+from server.config.types import HomeworkType
 
 
 class HomeworkRelatedMutation:

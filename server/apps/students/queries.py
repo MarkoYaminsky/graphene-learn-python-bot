@@ -1,6 +1,6 @@
 import graphene
-from apps.students.models import Student, StudentGroup
-from python_bot_api.types import StudentType, StudentGroupType
+from server.apps.students.models import Student, StudentGroup
+from server.config.types import StudentType, StudentGroupType
 
 
 class StudentQuery(graphene.ObjectType):
